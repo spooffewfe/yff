@@ -11,7 +11,7 @@ import sys
 
 def install_requirements():
     try:
-        with open("%TEMP%/EZRA_TEMP/requirements.txt", "r") as req_file:
+        with open("./requirements.txt", "r") as req_file:
             requirements = req_file.readlines()
         for module in requirements:
             module = module.strip()
@@ -1272,7 +1272,7 @@ def func():
 if __name__ == '__main__':
     init(convert=True)
     if len(sys.argv) < 2:
-        ua = open('%TEMP%/EZRA_TEMP/resources/ua.txt', 'r').read().split('\n')
+        ua = open('./resources/ua.txt', 'r').read().split('\n')
         clear()
         main()
         while True:
@@ -1283,7 +1283,7 @@ if __name__ == '__main__':
         stdout.write("Method: cfb, pxcfb, cfreq, cfsoc, pxsky, sky, http2, pxhttp2, get, post, head, soc, pxraw, pxsoc\n")
         stdout.write(f"usage:~# python3 {sys.argv[0]} <method> <target> <thread> <time>\n")
         sys.exit()
-    ua = open('%TEMP%/EZRA_TEMP/resources/ua.txt', 'r').read().split('\n')
+    ua = open('./resources/ua.txt', 'r').read().split('\n')
     method = sys.argv[1].rstrip()
     target = sys.argv[2].rstrip()
     thread = sys.argv[3].rstrip()
