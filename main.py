@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from os import system, name
+from os import system, namex
 import os, threading, requests, sys, cloudscraper, datetime, time, socket, socks, ssl, random, httpx
 from urllib.parse import urlparse
 from requests.cookies import RequestsCookieJar
