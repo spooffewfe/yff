@@ -1271,8 +1271,18 @@ def func():
 
 if __name__ == '__main__':
     init(convert=True)
+    ua_url = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/ua.txt"
+
     if len(sys.argv) < 2:
-        ua = open('./resources/ua.txt', 'r').read().split('\n')
+        try:
+            # Fetch ua.txt content from the URL
+            response = requests.get(ua_url)
+            response.raise_for_status()
+            ua = response.text.split('\n')
+        except requests.RequestException as e:
+            sys.stderr.write(f"Failed to fetch ua.txt from {ua_url}: {e}\n")
+            sys.exit(1)
+
         clear()
         main()
         while True:
@@ -1280,8 +1290,8 @@ if __name__ == '__main__':
     elif len(sys.argv) == 5:
         pass
     else:
-        stdout.write("Method: cfb, pxcfb, cfreq, cfsoc, pxsky, sky, http2, pxhttp2, get, post, head, soc, pxraw, pxsoc\n")
-        stdout.write(f"usage:~# python3 {sys.argv[0]} <method> <target> <thread> <time>\n")
+        sys.stdout.write("Method: cfb, pxcfb, cfreq, cfsoc, pxsky, sky, http2, pxhttp2, get, post, head, soc, pxraw, pxsoc\n")
+        sys.stdout.write(f"usage:~# python3 {sys.argv[0]} <method> <target> <thread> <time>\n")
         sys.exit()
     ua = open('./resources/ua.txt', 'r').read().split('\n')
     method = sys.argv[1].rstrip()
