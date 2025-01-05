@@ -1293,7 +1293,6 @@ if __name__ == '__main__':
         sys.stdout.write("Method: cfb, pxcfb, cfreq, cfsoc, pxsky, sky, http2, pxhttp2, get, post, head, soc, pxraw, pxsoc\n")
         sys.stdout.write(f"usage:~# python3 {sys.argv[0]} <method> <target> <thread> <time>\n")
         sys.exit()
-    ua = open('./resources/ua.txt', 'r').read().split('\n')
     method = sys.argv[1].rstrip()
     target = sys.argv[2].rstrip()
     thread = sys.argv[3].rstrip()
