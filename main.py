@@ -9,6 +9,7 @@ from colorama import Fore, init
 import subprocess
 import sys
 
+
 def install_requirements():
     try:
         with open("./requirements.txt", "r") as req_file:
