@@ -1,5 +1,9 @@
 import os
 import time
+import sys
+
+# Suppress unnecessary output
+sys.stdout = open(os.devnull, 'w')
 
 def animated_text(text, color_code):
     for char in text:
@@ -7,7 +11,8 @@ def animated_text(text, color_code):
         time.sleep(0.1)
     print("\n")
 
-# Start the installation process with animated text
+# Show animated text
+sys.stdout = sys.__stdout__  # Restore normal output for animated text
 animated_text("Installing Dependencies...", "0;255;58")
 
 # Automatically install the required packages using 'python -m pip install'
@@ -22,4 +27,5 @@ if os.name != "nt":
     os.system("wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb")
     os.system("apt-get install ./google-chrome-stable_current_amd64.deb")
 
+sys.stdout = sys.__stdout__  # Restore normal output
 print("Done.")
