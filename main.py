@@ -11,21 +11,24 @@ import sys
 
 
 def install_requirements():
-    try:
-        with open("./requirements.txt", "r") as req_file:
-            requirements = req_file.readlines()
-        for module in requirements:
-            module = module.strip()
-            try:
-                __import__(module.split('==')[0])  # Check if the module is already installed
-            except ImportError:
-                print(f"Installing missing module: {module}")
-                subprocess.check_call([sys.executable, "-m", "pip", "install", module])
-    except FileNotFoundError:
-        print("requirements.txt file not found. Please create it with the necessary modules.")
-        sys.exit(1)
+    # List of required modules
+    required_modules = [
+        "cloudscraper",
+        "socks",
+        "pysocks",
+        "colorama",
+        "undetected_chromedriver",
+        "httpx"
+    ]
+    
+    for module in required_modules:
+        try:
+            __import__(module.split('==')[0])  # Check if the module is already installed
+        except ImportError:
+            print(f"Installing missing module: {module}")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", module])
 
-# Install missing modules
+# Run the function to install the modules
 install_requirements()
 
 # Add the rest of your main.py logic here
