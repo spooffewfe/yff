@@ -30,6 +30,7 @@ os.system("python -m pip install -q pysocks")
 os.system("python -m pip install -q colorama")
 os.system("python -m pip install -q undetected_chromedriver")
 os.system("python -m pip install -q httpx")
+os.system("python -m pip install -q setuptools")
 
 if os.name != "nt":
     os.system("wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb")
